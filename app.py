@@ -1,5 +1,5 @@
-#removed openai chatbot
-# saved app.py
+#gemini
+
 from flask import Flask,request,render_template
 import google.generativeai as genai
 import os
