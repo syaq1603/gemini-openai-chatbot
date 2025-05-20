@@ -1,10 +1,12 @@
-#gemini
+#added main chatbot
 
 from flask import Flask, request, render_template
 import google.generativeai as genai
 from openai import OpenAI
 import os
 from markdown2 import Markdown
+import sqlite3
+import datetime
 
 # Configure Gemini
 gemini_api_key = os.environ["makersuite"]
@@ -17,13 +19,63 @@ client = OpenAI(api_key=openai_api_key)
 
 app = Flask(__name__)
 
+first_time = 1
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     return render_template("index.html")
+
+@app.route("/main",methods=["GET","POST"])
+def main():
+    global first_time
+    if first_time==1:
+        q = request.form.get("q")
+        print(q)
+        t = datetime.datetime.now()
+        conn = sqlite3.connect('user.db')
+        c = conn.cursor()
+        c.execute("insert into users(name,timestamp) values(?,?)",(q,t))
+        conn.commit()
+        c.close()
+        conn.close()
+        first_time=0
+    return(render_template("main.html"))
 
 # Gemini routes
 @app.route("/gemini", methods=["GET", "POST"])
 def gemini():
     return render_template("gemini.html")
 
+@app.route("/gemini_reply",methods=["GET","POST"])
+def gemini_reply():
+    q = request.form.get("q")
+    print(q)
+    r = model.generate_content(q)
+    return(render_template("gemini_reply.html",r=r.text))
 
+@app.route("/user_log",methods=["GET","POST"])
+def user_log():
+    #read
+    conn = sqlite3.connect('user.db')
+    c = conn.cursor()
+    c.execute("select * from users")
+    r=""
+    for row in c:
+        print(row)
+        r= r+str(row)
+    c.close()
+    conn.close()
+    return(render_template("user_log.html",r=r))
+
+@app.route("/delete_log",methods=["GET","POST"])
+def delete_log():
+    conn = sqlite3.connect('user.db')
+    c = conn.cursor()
+    c.execute("delete from users")
+    conn.commit()
+    c.close()
+    conn.close()
+    return(render_template("delete_log.html"))
+
+if __name__ == "__main__":
+    app.run()
