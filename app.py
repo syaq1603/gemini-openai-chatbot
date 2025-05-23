@@ -1,18 +1,17 @@
-#gemini
+#update app with paynow
 
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask,request,render_template
 import google.generativeai as genai
 import os
 import sqlite3
 import datetime
 
-gemini_api_key = 'AIzaSyCLuc4AhCtjvJBs9cOlB8r1v7p82CEh-pA'
+gemini_api_key = os.getenv("gemini_api_key")
 
 genai.configure(api_key=gemini_api_key)
-model = genai.GenerativeModel("gemini-1.5-flash")
+model = genai.GenerativeModel("gemini-2.0-flash")
 
 app = Flask(__name__)
-app.secret_key = "mySecretKey123!"
 
 first_time = 1
 
@@ -40,17 +39,16 @@ def main():
 def gemini():
     return(render_template("gemini.html"))
 
-@app.route("/gemini_reply", methods=["GET", "POST"])
+@app.route("/gemini_reply",methods=["GET","POST"])
 def gemini_reply():
     q = request.form.get("q")
-    print("Question received:", q)
-    try:
-        r = model.generate_content(q)
-        response_text = r.text
-    except Exception as e:
-        print("Error:", e)
-        response_text = "Sorry, an error occurred while generating the response."
-    return render_template("gemini_reply.html", r=response_text)
+    print(q)
+    r = model.generate_content(q)
+    return(render_template("gemini_reply.html",r=r.text))
+
+@app.route("/paynow",methods=["GET","POST"])
+def paynow():
+    return(render_template("paynow.html"))
 
 @app.route("/user_log",methods=["GET","POST"])
 def user_log():
@@ -76,11 +74,11 @@ def delete_log():
     conn.close()
     return(render_template("delete_log.html"))
 
-@app.route("/logout", methods=["POST"])
+@app.route("/logout",methods=["GET","POST"])
 def logout():
-    session.clear()
-    return redirect(url_for("main"))
-
+    global first_time
+    first_time = 1
+    return(render_template("index.html"))
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run()
