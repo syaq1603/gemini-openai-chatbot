@@ -1,0 +1,31 @@
+<head>
+    <meta name ="viewport" content ="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static',filename='styles.css')}}">
+</head>
+<body>
+    <div class="container">
+        <h2>Transfer Money</h2>
+        <input type=""text" id=""payer" placeholder=""Payer Address">
+        <input type="text" id="payer" placeholder="Payer Address">
+        <input type="text" id="payee" placeholder="Payee Address">
+        <input type="number" id="amount" placeholder="Amount">
+        <button class="btn" onclick="transfer()">Transfer Money</button>
+        <button class="btn" onclick="transaction()">View Transaction</button>
+        <p id="view_payer"></p>
+        <p id="view_payee"></p>
+        <p id="view_amount"></p>
+        <form action="/main" method="post">     
+            <input type="submit" value="Main">
+        </form>
+        
+    </div>
+    <script>
+        async function transfer() {           
+        }
+        async function transaction() {
+        }
+    </script>
+
+</body
+        
+     
